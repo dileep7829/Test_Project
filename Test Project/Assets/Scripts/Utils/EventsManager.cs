@@ -1,20 +1,21 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-/// <summary>
-/// Singleton Event Manager Class for ease of Use
-/// </summary>
-public class EventsManager : MonoBehaviour
+
+namespace Utils
 {
-    public static EventsManager Instance;
-
-    private void Awake()
+    /// <summary>
+    /// Singleton Event Manager Class for ease of Use
+    /// </summary>
+    public class EventsManager : MonoBehaviour
     {
-        if (Instance == null)
-            Instance = this;
+        public static EventsManager Instance;
+
+        private void Awake()
+        {
+            if (Instance == null)
+                Instance = this;
+        }
+
+        public EventHandler<string> OnButtonClicked;
     }
-
-    public EventHandler<string> OnButtonClicked;
-
 }
