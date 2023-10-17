@@ -15,8 +15,6 @@ public class EventsManager : MonoBehaviour
             Instance = this;
     }
 
-    public EventHandler<string> OnLetterClicked;
-    public EventHandler<int> OnNewHighScore;
-    public EventHandler<int> OnNewScore;
+    public EventHandler<string> OnButtonClicked;
 
 }
