@@ -20,5 +20,8 @@ namespace Utils
         public EventHandler OnItemHideStart;
         public EventHandler OnItemRemoveStart;
         public EventHandler OnItemRemoved;
+        public EventHandler OnItemMatched;
+        public EventHandler OnItemUnMatched;
+        public EventHandler OnGameFinished;
     }
 }

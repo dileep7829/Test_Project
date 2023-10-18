@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using ScriptableObjects;
-using TMPro;
 using UnityEngine;
 using Utils;
 using Views.Game;
@@ -13,20 +12,17 @@ namespace Controllers.Game
         [SerializeField] private RectTransform gamePanel;
         [SerializeField] private PuzzleButton puzzleButton;
         [SerializeField] private  SpriteHolder spriteHolder;
-        [SerializeField] private  TMP_Text txtMatchCount;
-        [SerializeField] private  TMP_Text txtTurnCount;
-        private int matchCount;
-        private int turnCount;
-        private int totalButtonsCount;
         
-        private List<Sprite> puzzleSprites = new List<Sprite>();
-        private PuzzleButton button1;
+        private List<Sprite> _puzzleSprites = new List<Sprite>();
+        private PuzzleButton _button1;
+        private int _totalButtonsCount;
+        private bool _isGameFinished;
         
         void Start()
         {
-            matchCount = 0;
-            turnCount = 0;
-            totalButtonsCount = GlobalData.rowCount * GlobalData.columnCount;
+            _isGameFinished = false;
+            _totalButtonsCount = GlobalData.rowCount * GlobalData.columnCount;
+            GlobalData.targetCount = _totalButtonsCount / 2;
             
             Randomizer.RandomizeArray(ref spriteHolder.Sprites);
             CreatePuzzleButtons();
@@ -35,46 +31,47 @@ namespace Controllers.Game
         private void CreatePuzzleButtons()
         {
             CreatePuzzleSprites();
-            for (int i = 0; i < totalButtonsCount; i++)
+            for (int i = 0; i < _totalButtonsCount; i++)
             {
                 PuzzleButton btn = Instantiate(puzzleButton, gamePanel, false);
-                btn.SetButtonData(i, puzzleSprites[i]);
+                btn.SetButtonData(i, _puzzleSprites[i]);
             }
         }
 
         private void CreatePuzzleSprites()
         {
-            for (int i = 0; i < totalButtonsCount; i++)
+            for (int i = 0; i < _totalButtonsCount; i++)
             {
-                puzzleSprites.Add(spriteHolder.Sprites[i % (totalButtonsCount/2)]);
+                _puzzleSprites.Add(spriteHolder.Sprites[i % (_totalButtonsCount/2)]);
             }
-            Randomizer.RandomizeList(ref puzzleSprites);
+            Randomizer.RandomizeList(ref _puzzleSprites);
         }
 
         private void OnButtonClickedEvent(object sender, EventArgs e)
         {
             PuzzleButton currentButton = (PuzzleButton)sender;
-            if (button1 == null)
+            if (_button1 == null)
             {
-                button1 = currentButton;
+                _button1 = currentButton;
             }
             else
             {
-                txtTurnCount.text = ++turnCount + "";
-                if (button1.ItemImg == currentButton.ItemImg)
+                if (_button1.ItemImg == currentButton.ItemImg)
                 {
-                    txtMatchCount.text = ++matchCount + "";
+                    
+                    EventsManager.Instance.OnItemMatched.Invoke(this,null);
                     //Debug.Log("It's a Match");
                     StartCoroutine(currentButton.RemoveItem());
-                    StartCoroutine(button1.RemoveItem());
+                    StartCoroutine(_button1.RemoveItem());
                 }
                 else
                 {
                     //Debug.Log("It's not a Match");
+                    EventsManager.Instance.OnItemUnMatched.Invoke(this,null);
                     StartCoroutine(currentButton.HideItem());
-                    StartCoroutine(button1.HideItem());
+                    StartCoroutine(_button1.HideItem());
                 }
-                button1 = null;
+                _button1 = null;
             }
         }
         
@@ -87,6 +84,11 @@ namespace Controllers.Game
         {
             SoundPlayer.Instance.PlaySFX(SoundNames.CORRECT);
         }
+        
+        private void OnGameFinishedEvent(object sender, EventArgs e)
+        {
+            _isGameFinished = true;
+        }
 
         private void OnItemRemovedEvent(object sender, EventArgs e)
         {
@@ -95,10 +97,9 @@ namespace Controllers.Game
 
         private void CheckWinCondition()
         {
-            if (matchCount >= totalButtonsCount / 2)
+            if (_isGameFinished)
             {
                 SoundPlayer.Instance.PlaySFX(SoundNames.GAME_END);
-                Debug.Log("You Won");
             }
         }
 
@@ -108,6 +109,7 @@ namespace Controllers.Game
             EventsManager.Instance.OnItemHideStart += OnItemHideStartEvent;
             EventsManager.Instance.OnItemRemoveStart += OnItemRemoveStartEvent;
             EventsManager.Instance.OnItemRemoved += OnItemRemovedEvent;
+            EventsManager.Instance.OnGameFinished += OnGameFinishedEvent;
         }
 
         private void OnDisable()
@@ -116,6 +118,7 @@ namespace Controllers.Game
             EventsManager.Instance.OnItemHideStart -= OnItemHideStartEvent;
             EventsManager.Instance.OnItemRemoveStart -= OnItemRemoveStartEvent;
             EventsManager.Instance.OnItemRemoved -= OnItemRemovedEvent;
+            EventsManager.Instance.OnGameFinished -= OnGameFinishedEvent;
         }
     }
 }
