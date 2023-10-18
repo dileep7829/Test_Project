@@ -47,13 +47,11 @@ public class LobbyController : MonoBehaviour
     public void OnRowsDropdownValueChanged()
     {
         GlobalData.rowCount = int.Parse(rowsDropdown.options[rowsDropdown.value].text);
-        Debug.Log("GlobalData.rowCount : "+ GlobalData.rowCount);
     }
     
     public void OnColumnsDropdownValueChanged()
     {
         GlobalData.columnCount = int.Parse(columnDropdown.options[columnDropdown.value].text);
-        Debug.Log("GlobalData.columnCount : "+ GlobalData.columnCount);
     }
 
     public int GetDropdownIndex(TMP_Dropdown dropdown, int item)

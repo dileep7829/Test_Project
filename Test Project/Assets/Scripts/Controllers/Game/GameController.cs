@@ -23,7 +23,7 @@ namespace Controllers.Game
         void Start()
         {
             GameData gameData = StorageHandler.Instance.GetGameData();
-            if(PlayerPrefs.GetInt("IsGameFinished")==0 && gameData!=null)
+            if(PlayerPrefs.GetInt("IsGameRunning")==1 && gameData!=null)
             {
                 LoadGameFromData(gameData);
             }
@@ -36,9 +36,10 @@ namespace Controllers.Game
                 CreatePuzzleButtons();
                 
                 GameData.Instance.TotalButtonsCount = _totalButtonsCount;
+                StorageHandler.Instance.WriteToFile("");
             }
             _isGameFinished = false;
-            PlayerPrefs.SetInt("IsGameFinished", 0);
+            PlayerPrefs.SetInt("IsGameRunning",1);
         }
 
         private void CreatePuzzleButtons()
@@ -99,7 +100,8 @@ namespace Controllers.Game
         private void OnGameFinishedEvent(object sender, EventArgs e)
         {
             _isGameFinished = true;
-            PlayerPrefs.SetInt("IsGameFinished",1);
+            PlayerPrefs.SetInt("IsGameRunning",0);
+            StorageHandler.Instance.WriteToFile("");
         }
 
         private void OnItemRemovedEvent(object sender, EventArgs e)
@@ -113,6 +115,7 @@ namespace Controllers.Game
             {
                 gameOverPopup.SetActive(true);
                 SoundPlayer.Instance.PlaySFX(SoundNames.GAME_END);
+                StorageHandler.Instance.WriteToFile("");
             }
         }
 
