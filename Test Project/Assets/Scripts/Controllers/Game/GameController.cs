@@ -12,6 +12,7 @@ namespace Controllers.Game
         [SerializeField] private RectTransform gamePanel;
         [SerializeField] private PuzzleButton puzzleButton;
         [SerializeField] private  SpriteHolder spriteHolder;
+        [SerializeField] private  GameObject gameOverPopup;
         
         private List<Sprite> _puzzleSprites = new List<Sprite>();
         private PuzzleButton _button1;
@@ -99,6 +100,7 @@ namespace Controllers.Game
         {
             if (_isGameFinished)
             {
+                gameOverPopup.SetActive(true);
                 SoundPlayer.Instance.PlaySFX(SoundNames.GAME_END);
             }
         }

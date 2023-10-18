@@ -13,7 +13,10 @@ namespace Utils
         private void Awake()
         {
             if (Instance == null)
+            {
                 Instance = this;
+                DontDestroyOnLoad(this);
+            }
         }
 
         public EventHandler OnButtonClicked;
