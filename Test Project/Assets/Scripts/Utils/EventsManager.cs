@@ -16,6 +16,7 @@ namespace Utils
                 Instance = this;
         }
 
-        public EventHandler<string> OnButtonClicked;
+        public EventHandler OnButtonClicked;
+        public EventHandler OnItemRemoved;
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using Controllers;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -22,7 +23,7 @@ namespace Views.Game
             if(button.image.sprite == itemImg)
                 return;
             ShowItem();
-            EventsManager.Instance.OnButtonClicked.Invoke(this, "");
+            EventsManager.Instance.OnButtonClicked.Invoke(this,null);
         }
 
         public void SetButtonData(int index, Sprite sprite)
@@ -36,13 +37,13 @@ namespace Views.Game
         private void ShowItem()
         {
             button.image.sprite = itemImg;
+            SoundPlayer.Instance.PlaySFX(SoundNames.OPEN);
         }
 
         public IEnumerator HideItem()
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
             button.image.sprite = bgImg;
-            
         }
 
         public IEnumerator RemoveItem()
@@ -50,6 +51,7 @@ namespace Views.Game
             yield return new WaitForSeconds(0.5f);
             button.image.color = new Color(1, 1, 1, 0);
             button.interactable = false;
+            EventsManager.Instance.OnItemRemoved.Invoke(this,null);
         }
         
     }

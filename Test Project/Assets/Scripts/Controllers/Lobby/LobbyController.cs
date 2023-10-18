@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -13,15 +14,23 @@ public class LobbyController : MonoBehaviour
     [SerializeField] private TMP_Dropdown rowsDropdown;
     [SerializeField] private TMP_Dropdown columnDropdown;
     
-    void Start()
+    private void OnEnable()
     {
-        rowsDropdown.value = GetDropdownIndex(rowsDropdown, GlobalData.rowCountDefault);
-        columnDropdown.value = GetDropdownIndex(columnDropdown, GlobalData.columnCountDefault);
+        rowsDropdown.value = GetDropdownIndex(rowsDropdown, GlobalData.rowCount);
+        columnDropdown.value = GetDropdownIndex(columnDropdown, GlobalData.columnCount);
         
         rowsDropdown.onValueChanged.AddListener(delegate { OnRowsDropdownValueChanged(); });
         columnDropdown.onValueChanged.AddListener(delegate { OnColumnsDropdownValueChanged(); });
         
         playButton.onClick.AddListener(OnPlayButtonClicked);
+    }
+    
+    private void OnDisable()
+    { 
+        rowsDropdown.onValueChanged.RemoveListener(delegate { OnRowsDropdownValueChanged(); });
+        columnDropdown.onValueChanged.RemoveListener(delegate { OnColumnsDropdownValueChanged(); });
+        
+        playButton.onClick.RemoveListener(OnPlayButtonClicked);
     }
 
     public void OnPlayButtonClicked()
