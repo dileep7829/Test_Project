@@ -36,7 +36,6 @@ namespace Controllers.Game
                 CreatePuzzleButtons();
                 
                 GameData.Instance.TotalButtonsCount = _totalButtonsCount;
-                StorageHandler.Instance.WriteToFile("");
             }
             _isGameFinished = false;
             PlayerPrefs.SetInt("IsGameRunning",1);
@@ -45,6 +44,7 @@ namespace Controllers.Game
         private void CreatePuzzleButtons()
         {
             CreatePuzzleSprites();
+            GameData.Instance.ButtonsData.Clear();
             for (int i = 0; i < _totalButtonsCount; i++)
             {
                 PuzzleButton btn = Instantiate(puzzleButton, gamePanel, false);
