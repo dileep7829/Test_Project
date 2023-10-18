@@ -13,6 +13,7 @@ public class LobbyController : MonoBehaviour
     [SerializeField] private Button playButton;
     [SerializeField] private TMP_Dropdown rowsDropdown;
     [SerializeField] private TMP_Dropdown columnDropdown;
+    [SerializeField] private GameObject error;
     
     private void OnEnable()
     {
@@ -35,6 +36,11 @@ public class LobbyController : MonoBehaviour
 
     public void OnPlayButtonClicked()
     {
+        if (GlobalData.rowCount % 2 == 1 && GlobalData.columnCount % 2 == 1)
+        {
+            error.SetActive(true);
+            return;
+        }
         SceneManager.LoadScene(GlobalData.GAME_SCENE_INDEX);
     }
 

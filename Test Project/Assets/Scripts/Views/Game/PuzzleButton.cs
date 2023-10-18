@@ -1,5 +1,6 @@
 using System.Collections;
 using Controllers;
+using Data;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
@@ -74,6 +75,7 @@ namespace Views.Game
 
         public IEnumerator RemoveItem()
         {
+            GameData.Instance.ButtonsData[int.Parse(name)].IsVisible = false;
             yield return new WaitForSeconds(1f);
             
             EventsManager.Instance.OnItemRemoveStart.Invoke(this,null);
@@ -83,6 +85,15 @@ namespace Views.Game
                 button.interactable = false;
                 EventsManager.Instance.OnItemRemoved.Invoke(this,null);
             });
+        }
+
+        public void MakeButtonInvisible()
+        {
+            button = GetComponent<Button>();
+            button.image.sprite = bgImg;
+            
+            button.interactable = false;
+            button.image.color = new Color(1, 1, 1, 0);
         }
         
     }

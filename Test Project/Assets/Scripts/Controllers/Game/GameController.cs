@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Data;
 using ScriptableObjects;
 using UnityEngine;
 using Utils;
@@ -21,12 +22,23 @@ namespace Controllers.Game
         
         void Start()
         {
+            GameData gameData = StorageHandler.Instance.GetGameData();
+            if(PlayerPrefs.GetInt("IsGameFinished")==0 && gameData!=null)
+            {
+                LoadGameFromData(gameData);
+            }
+            else
+            {
+                _totalButtonsCount = GlobalData.rowCount * GlobalData.columnCount;
+                GlobalData.targetCount = _totalButtonsCount / 2;
+
+                Randomizer.RandomizeArray(ref spriteHolder.Sprites);
+                CreatePuzzleButtons();
+                
+                GameData.Instance.TotalButtonsCount = _totalButtonsCount;
+            }
             _isGameFinished = false;
-            _totalButtonsCount = GlobalData.rowCount * GlobalData.columnCount;
-            GlobalData.targetCount = _totalButtonsCount / 2;
-            
-            Randomizer.RandomizeArray(ref spriteHolder.Sprites);
-            CreatePuzzleButtons();
+            PlayerPrefs.SetInt("IsGameFinished", 0);
         }
 
         private void CreatePuzzleButtons()
@@ -36,6 +48,7 @@ namespace Controllers.Game
             {
                 PuzzleButton btn = Instantiate(puzzleButton, gamePanel, false);
                 btn.SetButtonData(i, _puzzleSprites[i]);
+                GameData.Instance.ButtonsData.Add(new ButtonData(i,true, _puzzleSprites[i].name));
             }
         }
 
@@ -59,18 +72,15 @@ namespace Controllers.Game
             {
                 if (_button1.ItemImg == currentButton.ItemImg)
                 {
-                    
-                    EventsManager.Instance.OnItemMatched.Invoke(this,null);
-                    //Debug.Log("It's a Match");
                     StartCoroutine(currentButton.RemoveItem());
                     StartCoroutine(_button1.RemoveItem());
+                    EventsManager.Instance.OnItemMatched.Invoke(this,null);
                 }
                 else
                 {
-                    //Debug.Log("It's not a Match");
-                    EventsManager.Instance.OnItemUnMatched.Invoke(this,null);
                     StartCoroutine(currentButton.HideItem());
                     StartCoroutine(_button1.HideItem());
+                    EventsManager.Instance.OnItemUnMatched.Invoke(this,null);
                 }
                 _button1 = null;
             }
@@ -89,6 +99,7 @@ namespace Controllers.Game
         private void OnGameFinishedEvent(object sender, EventArgs e)
         {
             _isGameFinished = true;
+            PlayerPrefs.SetInt("IsGameFinished",1);
         }
 
         private void OnItemRemovedEvent(object sender, EventArgs e)
@@ -121,6 +132,45 @@ namespace Controllers.Game
             EventsManager.Instance.OnItemRemoveStart -= OnItemRemoveStartEvent;
             EventsManager.Instance.OnItemRemoved -= OnItemRemovedEvent;
             EventsManager.Instance.OnGameFinished -= OnGameFinishedEvent;
+        }
+
+        private void LoadGameFromData(GameData gameData)
+        {
+            GameData.Instance = gameData;
+            _totalButtonsCount = gameData.TotalButtonsCount;
+            GlobalData.targetCount = _totalButtonsCount / 2;
+            CreatePuzzleButtonsFromData();
+            EventsManager.Instance.OnLoadingGameFromData.Invoke(this,null);
+        }
+
+        private void CreatePuzzleButtonsFromData()
+        {
+            for (int i = 0; i < _totalButtonsCount; i++)
+            {
+                PuzzleButton btn = Instantiate(puzzleButton, gamePanel, false);
+                ButtonData buttonData = GameData.Instance.ButtonsData[i];
+                if (buttonData.IsVisible)
+                {
+                    btn.SetButtonData(buttonData.Id, GetSprite(buttonData.SpriteName));
+                }
+                else
+                {
+                    btn.MakeButtonInvisible();
+                }
+            }
+        }
+
+        private Sprite GetSprite(string spriteName)
+        {
+            foreach (var sprite in spriteHolder.Sprites)
+            {
+                if (sprite.name.Equals(spriteName))
+                {
+                    return sprite;
+                }
+            }
+
+            return spriteHolder.Sprites[0];
         }
     }
 }

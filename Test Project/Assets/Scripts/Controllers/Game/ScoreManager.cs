@@ -1,4 +1,6 @@
 using System;
+using Data;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using Utils;
@@ -21,19 +23,21 @@ namespace Controllers.Game
         {
             EventsManager.Instance.OnItemMatched += OnItemMatchedEvent;
             EventsManager.Instance.OnItemUnMatched += OnItemUnmatchedEvent;
+            EventsManager.Instance.OnLoadingGameFromData += OnLoadingGameFromDataEvent;
         }
 
         private void OnDisable()
         {
             EventsManager.Instance.OnItemMatched -= OnItemMatchedEvent;
             EventsManager.Instance.OnItemUnMatched -= OnItemUnmatchedEvent;
+            EventsManager.Instance.OnLoadingGameFromData -= OnLoadingGameFromDataEvent;
         }
     
         // Start is called before the first frame update
-        void Start()
+        /*void Start()
         {
             ResetData();
-        }
+        }*/
 
         private void ResetData()
         {
@@ -52,6 +56,7 @@ namespace Controllers.Game
             _unmatchSteak = 0;
             CalculateAndSetScore();
             CheckWinCondition();
+            SetGameDataAndSave();
         }
 
         private void OnItemUnmatchedEvent(object sender, EventArgs e)
@@ -60,6 +65,7 @@ namespace Controllers.Game
             _matchSteak = 0;
             _unmatchSteak++;
             CalculateAndSetScore();
+            SetGameDataAndSave();
         }
 
         private void CalculateAndSetScore()
@@ -84,6 +90,31 @@ namespace Controllers.Game
         private void IncrementTurnCount()
         {
             txtTurnCount.text = ++_turnCount + "";
+        }
+        
+        private void SetGameDataAndSave()
+        {
+            GameData.Instance.Score = _score;
+            GameData.Instance.MatchCount = _matchCount;
+            GameData.Instance.TurnCount = _turnCount;
+            GameData.Instance.MatchSteak = _matchSteak;
+            GameData.Instance.UnMatchSteak = _unmatchSteak;
+
+            GameData gameData = GameData.Instance;
+            string gameDataString = JsonConvert.SerializeObject(gameData);
+            StorageHandler.Instance.WriteToFile(gameDataString);
+        }
+        
+        private void OnLoadingGameFromDataEvent(object sender, EventArgs e)
+        {
+            _matchSteak = GameData.Instance.MatchSteak;
+            _unmatchSteak = GameData.Instance.UnMatchSteak;
+            _score = GameData.Instance.Score;
+            _matchCount = GameData.Instance.MatchCount;
+            _turnCount = GameData.Instance.TurnCount;
+            txtScoreCount.text = _score + "";
+            txtMatchCount.text = _matchCount + "";
+            txtTurnCount.text = _turnCount + "";
         }
     }
 }

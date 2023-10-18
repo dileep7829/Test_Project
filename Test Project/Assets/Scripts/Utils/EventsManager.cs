@@ -26,5 +26,6 @@ namespace Utils
         public EventHandler OnItemMatched;
         public EventHandler OnItemUnMatched;
         public EventHandler OnGameFinished;
+        public EventHandler OnLoadingGameFromData;
     }
 }
