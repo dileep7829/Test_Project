@@ -17,6 +17,8 @@ namespace Utils
         }
 
         public EventHandler OnButtonClicked;
+        public EventHandler OnItemHideStart;
+        public EventHandler OnItemRemoveStart;
         public EventHandler OnItemRemoved;
     }
 }

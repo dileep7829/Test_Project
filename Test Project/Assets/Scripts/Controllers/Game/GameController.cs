@@ -67,18 +67,25 @@ namespace Controllers.Game
                     //Debug.Log("It's a Match");
                     StartCoroutine(currentButton.RemoveItem());
                     StartCoroutine(button1.RemoveItem());
-                    
-                    SoundPlayer.Instance.PlaySFX(SoundNames.CORRECT);
                 }
                 else
                 {
                     //Debug.Log("It's not a Match");
                     StartCoroutine(currentButton.HideItem());
                     StartCoroutine(button1.HideItem());
-                    SoundPlayer.Instance.PlaySFX(SoundNames.INCORRECT);
                 }
                 button1 = null;
             }
+        }
+        
+        private void OnItemHideStartEvent(object sender, EventArgs e)
+        {
+            SoundPlayer.Instance.PlaySFX(SoundNames.INCORRECT);
+        }
+        
+        private void OnItemRemoveStartEvent(object sender, EventArgs e)
+        {
+            SoundPlayer.Instance.PlaySFX(SoundNames.CORRECT);
         }
 
         private void OnItemRemovedEvent(object sender, EventArgs e)
@@ -98,12 +105,16 @@ namespace Controllers.Game
         private void OnEnable()
         {
             EventsManager.Instance.OnButtonClicked += OnButtonClickedEvent;
+            EventsManager.Instance.OnItemHideStart += OnItemHideStartEvent;
+            EventsManager.Instance.OnItemRemoveStart += OnItemRemoveStartEvent;
             EventsManager.Instance.OnItemRemoved += OnItemRemovedEvent;
         }
 
         private void OnDisable()
         {
             EventsManager.Instance.OnButtonClicked -= OnButtonClickedEvent;
+            EventsManager.Instance.OnItemHideStart -= OnItemHideStartEvent;
+            EventsManager.Instance.OnItemRemoveStart -= OnItemRemoveStartEvent;
             EventsManager.Instance.OnItemRemoved -= OnItemRemovedEvent;
         }
     }
